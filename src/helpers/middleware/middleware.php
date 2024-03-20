@@ -1,4 +1,5 @@
 <?php
+
 // KrISS aaaa: a simple and smart (or stupid) application as associative array
 // Copyleft (ɔ) - Tontof - http://tontof.net
 // use KrISS aaaa at your own risk
@@ -6,9 +7,9 @@
 declare(strict_types=1);
 
 /**
- * Middleware callable
+ * Middleware callable.
  *
- * @param callable|array $item corresponding to a callable function
+ * @param array|callable $item corresponding to a callable function
  *
  * @return callable corresponding to $item
  */
@@ -20,19 +21,19 @@ function middleware_callable($item): callable
             $item = call_user_func_array($fun, $item);
         }
     }
+
     if (!is_callable($item)) {
-        $item = function ($object = null) {
-            return $object;
-        };
+        $item = static fn($obj = null) => $obj;
     }
+
     return $item;
 }
 
 /**
- * Middleware
+ * Middleware.
  *
- * @param array<string|array|callable> $functions List of functions to apply
- * @param callable|array               $core      Core function to call
+ * @param array<array|callable|string> $functions List of functions to apply
+ * @param array|callable               $core      Core function to call
  *
  * @return callable to apply to a parameter
  */
@@ -40,15 +41,12 @@ function middleware(array $functions, $core = null): callable
 {
     return array_reduce(
         $functions,
-        function ($next, $item) {
-            return function ($object = null) use ($next, $item) {
-                $item = middleware_callable($item);
-                $function = new ReflectionFunction($item);
-                if (count($function->getParameters()) === 2) {
-                    return $item($object, $next);
-                }
-                return $item($next($object));
-            };
+        static fn($next, $item): \Closure => static function ($obj = null) use ($next, $item) {
+            $item = middleware_callable($item);
+            $function = new ReflectionFunction($item);
+            return 2 === count($function->getParameters())
+                ? $item($obj, $next)
+                : $item($next($obj));
         },
         middleware_callable($core)
     );

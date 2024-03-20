@@ -40,7 +40,7 @@ Licence?
 --------
 Copyleft (ɔ) - Tontof - http://tontof.net
 
-Use KrISS MVVM at your own risk.
+Use KrISS aaaa at your own risk.
 
 [Free software means users have the four essential freedoms](http://www.gnu.org/philosophy/philosophy.html):
 * to run the program
